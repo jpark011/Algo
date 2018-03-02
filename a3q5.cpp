@@ -1,22 +1,15 @@
-#include <cstring>
-#include <cstdlib>
 #include <string>
 #include <algorithm>
 #include <iostream>
 
 using namespace std;
 
-static char** getMinAlignment(const char* X, const char* Y, int d, int a) {
-  int m = strlen(X);
-  int n = strlen(Y);
+static string* getMinAlignment(const string& X, const string& Y, int d, int a) {
+  int m = X.length();
+  int n = Y.length();
   int longer = (m > n)? m : n;
   int A[m+1][n+1];
-  char** ret = new char*[3];
-  for (int i = 0; i < 3; i++) {
-    ret[i] = new char[longer+1];
-    ret[i][longer] = '\0';
-  }
-
+  string* ret = new string[3];
 
   // init array
   for (int i = 0; i <= m; i++) {
@@ -53,33 +46,38 @@ static char** getMinAlignment(const char* X, const char* Y, int d, int a) {
   // reconstruct
   int i = m;
   int j = n;
-  int k = longer-1;
   while (0 < i && 0 < j) {
     int left = A[i][j-1] + d;
     int up = A[i-1][j] + d;
     int diag = (X[i-1] == Y[j-1])? A[i-1][j-1] : A[i-1][j-1] + a;
 
+    char r0, r1, r2;
     if (A[i][j] == left) {
       j--;
-      ret[0][k] = '-';
-      ret[1][k] = ' ';
-      ret[2][k] = Y[j];
-      k--;
+      r0 = '-';
+      r1 = ' ';
+      r2 = Y[j];
     } else if (A[i][j] == up) {
       i--;
-      ret[0][k] = X[i];
-      ret[1][k] = ' ';
-      ret[2][k] = '-';
-      k--;
+      r0 = X[i];
+      r1 = ' ';
+      r2 = '-';
     } else {
       i--; j--;
-      ret[0][k] = X[i];
-      ret[1][k] = (X[i] == Y[j])? '|' : ' ';
-      ret[2][k] = Y[j];
-      k--;
+      r0 = X[i];
+      r1 = (X[i] == Y[j])? '|' : ' ';
+      r2 = Y[j];
     }
+
+    ret[0].append(1, r0);
+    ret[1].append(1, r1);
+    ret[2].append(1, r2);
   }
 
+
+  reverse(ret[0].begin(), ret[0].end());
+  reverse(ret[1].begin(), ret[1].end());
+  reverse(ret[2].begin(), ret[2].end());
   return ret;
 }
 
@@ -92,23 +90,20 @@ int main(int argc, char const *argv[]) {
   // }
 
   // get inputs from std
-  string tmp;
+  string X;
+  getline(cin, X);
 
-  getline(cin, tmp);
-  char X[tmp.length()];
-  strcpy(X, tmp.c_str());
+  string Y;
+  getline(cin, Y);
 
-  getline(cin, tmp);
-  char Y[tmp.length()];
-  strcpy(Y, tmp.c_str());
+  string in;
+  getline(cin, in);
+  int d = stoi(in);
 
-  getline(cin, tmp);
-  int d = atoi(tmp.c_str());
+  getline(cin, in);
+  int a = stoi(in);
 
-  getline(cin, tmp);
-  int a = atoi(tmp.c_str());
-
-  char** alignment = getMinAlignment(X, Y, d, a);
+  string* alignment = getMinAlignment(X, Y, d, a);
   // print
   for (int i = 0; i < 3; i++) {
     cout << alignment[i] << endl;
