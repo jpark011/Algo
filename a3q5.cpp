@@ -7,7 +7,6 @@ using namespace std;
 static string* getMinAlignment(const string& X, const string& Y, int d, int a) {
   int m = X.length();
   int n = Y.length();
-  int longer = (m > n)? m : n;
   int A[m+1][n+1];
   string* ret = new string[3];
 
@@ -46,9 +45,9 @@ static string* getMinAlignment(const string& X, const string& Y, int d, int a) {
   // reconstruct
   int i = m;
   int j = n;
-  while (0 < i && 0 < j) {
-    int left = A[i][j-1] + d;
-    int up = A[i-1][j] + d;
+  while (0 < i || 0 < j) {
+    int left = (0 < j)? A[i][j-1] + d : -1;
+    int up = (0 < i)? A[i-1][j] + d : -1;
     int diag = (X[i-1] == Y[j-1])? A[i-1][j-1] : A[i-1][j-1] + a;
 
     char r0, r1, r2;
@@ -69,15 +68,18 @@ static string* getMinAlignment(const string& X, const string& Y, int d, int a) {
       r2 = Y[j];
     }
 
-    ret[0].append(1, r0);
-    ret[1].append(1, r1);
-    ret[2].append(1, r2);
+    // cout << i << endl;
+    // cout << j << endl;
+    // cout << r0 << endl;
+    // cout << r1 << endl;
+    // cout << r2 << endl << endl;
+
+    // prepend to the beginning
+    ret[0].insert(ret[0].begin(), r0);
+    ret[1].insert(ret[1].begin(), r1);
+    ret[2].insert(ret[2].begin(), r2);
   }
 
-
-  reverse(ret[0].begin(), ret[0].end());
-  reverse(ret[1].begin(), ret[1].end());
-  reverse(ret[2].begin(), ret[2].end());
   return ret;
 }
 
@@ -91,19 +93,17 @@ int main(int argc, char const *argv[]) {
 
   // get inputs from std
   string X;
-  getline(cin, X);
-
   string Y;
-  getline(cin, Y);
+  int d;
+  int a;
 
-  string in;
-  getline(cin, in);
-  int d = stoi(in);
-
-  getline(cin, in);
-  int a = stoi(in);
+  cin >> X;
+  cin >> Y;
+  cin >> d;
+  cin >> a;
 
   string* alignment = getMinAlignment(X, Y, d, a);
+  // string* alignment = getMinAlignment("ACTTTTACGGGGGATCCCACACA", "CTTACTGGGGCCTTCACA", 1, 1);
   // print
   for (int i = 0; i < 3; i++) {
     cout << alignment[i] << endl;
