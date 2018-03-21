@@ -17,21 +17,21 @@ class Graph():
     def getReverse(self):
         ret = Graph(self.n, self.m)
 
-        for neighbors in (self.nodes):
-            for u, v in enumerate(neighbors):
+        for v, neighbors in enumerate(self.nodes):
+            for u in neighbors:
                 # add reversed arrow
-                ret.addEdge(v, u)
+                ret.addEdge(u, v)
 
         return ret
 
     # given a pointer to stack
     # return stack with filled values
-    def runDFS_Helper(self, v, stack, visited):
+    def DFS(self, v, stack, visited):
         visited[v] = True
 
         for u in self.nodes[v]:
             if visited[u] == False:
-                runDFS_Helper(u, stack, visited)
+                self.DFS(u, stack, visited)
         stack.append(v)
 
     # returns a stack of node number
@@ -43,13 +43,12 @@ class Graph():
 
         for v, neighbors in enumerate(self.nodes):
             if visited[v] == False:
-                self.runDFS_Helper(v, ret, visited)
-
+                self.DFS(v, ret, visited)
         return ret
 
     # mutate visited with source visiting in BFS method
     # returns # of nodes visited
-    def runBFS_Helper(self, source, visited):
+    def BFS(self, source, visited):
         ret = 1
         frontier = Queue()
 
@@ -75,7 +74,7 @@ class Graph():
         while stack:
             source = stack.pop()
             if visited[source] == False:
-                size = self.runBFS_Helper(source, visited)
+                size = self.BFS(source, visited)
                 ret.append(size)
 
         return ret
@@ -93,56 +92,47 @@ def kosaraju(graph):
     return graph.runBFS(stack)
 
 
-
-test_edges = [
-    (1, 2),
-    (1, 3),
-    (2, 3),
-    (2, 5),
-    (3, 1),
-    (3, 4),
-    (4, 5),
-    (4, 6),
-    (5, 4)
-]
-
 HOW_MANY = 5
 
 #__main__
 # get std inputs
 # and call Kosaraju
 def main(argv):
-    # n = int(input("Number of nodes: "))
-    # m = int(input("Number of edges: "))
-    # g = Graph(n, m)
-    #
-    # for i in range(m):
-    #     # just for convinience
-    #     # need to +1 when print out
-    #     v, u = [int(i)-1 for i in raw_input("Enter edge {}: ".format(i+1)).split()]
-    #     g.addEdge(v, u)
+    # file = open(argv[1])
 
-    ###### TESTING ######
-    n = 6
-    m = 9
+    n = int(raw_input())
+    m = int(raw_input())
     g = Graph(n, m)
 
-    for edge in test_edges:
-        g.addEdge(edge[0]-1, edge[1]-1)
+    for i in range(m):
+        # just for convinience
+        # need to +1 when print out
+        v, u = [int(i)-1 for i in raw_input().split()]
+        g.addEdge(v, u)
 
+    # file.close()
+
+    # python recursion limit
+    sys.setrecursionlimit(max(1000, n+5))
     res = kosaraju(g)
 
-    # biggest first
-    res.sort(reverse=True)
+    top_five = []
+    for i in range(HOW_MANY):
+        max_sofar = 0 #S-inf
+        for ele in res:
+            if max_sofar < ele:
+                max_sofar = ele
+        top_five.append(max_sofar)
+        if max_sofar != 0:
+            res.remove(max_sofar)
 
     for i in range(HOW_MANY):
-        if i < len(res):
-            print(res[i]),
+        if i < len(top_five):
+            print(top_five[i]),
         else:
             print(0),
-
-        if i < HOW_MANY-1:
-             print("\t"),
+        print("\t"),
+    print('')   # newline... wierd
 
 if __name__ == '__main__':
   main(sys.argv)
